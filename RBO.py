@@ -22,6 +22,12 @@ except:
     raise Exception('Could not import lists from files')
     sys.exit(2);
 
+#TODO Spearman's rank correlation
+#TODO Cosine correlation
+#TODO euclidean distance
+
+
+#----------------------------------------------#    
 def RBO(r1,r2,p,k):
     #Rank-Biased Overlap.
     #input
@@ -30,6 +36,10 @@ def RBO(r1,r2,p,k):
     #   k: the depth up to which compare the lists. 0 will compare the whole lists.
     #
     # the algorithm assumes no doubles
+    
+    if p >= 1:
+        raise Exception("Parameter p must be less than 1");
+        sys.exit(2);
     
     m = min(len(r1),len(r2));
     if (k <= 0) or (k > m):
@@ -62,27 +72,32 @@ def RBO(r1,r2,p,k):
         
         RBO += X;
     return RBO;
+#----------------------------------------------#
 
 
-def list2rank(lista):
+#----------------------------------------------#
+def list2rank(lista, sort):
     #create rank from disordered name-value list; put ties together.
     
-    val = lambda x: x[1];
-    ord = sorted(lista,key = val); #sort the list by second column;
-    
+    if sort:
+        val = lambda x: x[1];
+        lista = sorted(lista,key = val); #sort the list by second column;
+        
     ranked = [[ord[0][0],]]; #elements of this list will be ties-tuples
     k = 0;
     for i in range(1,len(ord)):
-        if ord[i][1] == ord[i-1][1]:
+        if lista[i][1] == lista[i-1][1]:
             #put together equal values
-            ranked[k].append(ord[i][0]);
+            ranked[k].append(lista[i][0]);
         else:
             #create new tuple for new values
             k +=1;
-            ranked.append([ord[i][0],]);
+            ranked.append([lista[i][0],]);
     return ranked;
+#----------------------------------------------#
 
-ranks = [list2rank(l) for l in lists];
+
+ranks = [list2rank(l,1) for l in lists];
 for i in range (15):
     print(RBO(ranks[0],ranks[1],0.9,i));
 
